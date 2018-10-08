@@ -5,3 +5,4 @@ cmake -C cmake_cache.cmake -H. -Bcmake-build-debug -G"Visual Studio 15 2017 Win6
 cmake --build cmake-build-debug --config Debug --target app1_exe
 
 pause
+start cmake-build-debug\hpxapp1.sln
