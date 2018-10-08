@@ -6,18 +6,18 @@
 #include <iterator>
 
 #include <algorithm>
+#include <array>
+#include <execution>
 #include <numeric>
 #include <vector>
-#include <execution>
 
 #include <boost/type_index.hpp>
+
+int const N = 10;
 
 // Reference: https://github.com/STEllAR-GROUP/hpx/tree/HEAD/tests/unit/util/iterator
 struct adaptable_mult_functor
 {
-    using result_type = int;
-    using argument_type = int;
-
     adaptable_mult_functor() {}
 
     template <typename Iterator>
@@ -26,30 +26,52 @@ struct adaptable_mult_functor
         std::cout << boost::typeindex::type_id_with_cvr<Iterator>().pretty_name() << "\n";
         return 2 * *b;
     }
-
-    int a;
 };
+
+std::vector<int> fill_array()
+{
+    std::vector<int> x(10);
+
+    std::iota(x.begin(), x.end(), 1);
+
+    std::copy(x.begin(), x.end(), std::ostream_iterator<int>{std::cout, " "});
+
+    std::cout << "\n";
+
+    return x;
+}
+
+void transform_iterator_function_object()
+{
+    std::vector<int> x = fill_array();
+
+    using iter_t = hpx::util::transform_iterator<std::vector<int>::iterator,
+        adaptable_mult_functor>;
+    iter_t i(x.begin(), adaptable_mult_functor{});
+    iter_t end = i + N;
+
+    std::copy(i, end, std::ostream_iterator<int>{std::cout, " "});
+
+    std::cout << "\n";
+}
+
+void transform_iterator_lambda()
+{
+    std::vector<int> x = fill_array();
+
+    auto i = hpx::util::make_transform_iterator(
+        x.begin(), [](std::vector<int>::iterator x) { return 2 * *x; });
+    auto end = i + N;
+
+    std::copy(i, end, std::ostream_iterator<int>{std::cout, " "});
+
+    std::cout << "\n";
+}
 
 int hpx_main(int argc, char* argv[])
 {
-    int const N = 10;
-    int x[N], y[N];
-    std::iota(x, x + N, 1);
-
-    std::copy(x, x + N, y);
-
-    std::for_each(x, x + N, [](int& n) { n *= 2; });
-
-    std::copy(x, x + N, std::ostream_iterator<int>{std::cout, " "});
-
-    using iter_t = hpx::util::transform_iterator<int*, adaptable_mult_functor>;
-    iter_t i(y, adaptable_mult_functor{});
-    iter_t end = i + N;
-    //auto f = [](int* x) { return 2 * *x; };
-    //auto i = hpx::util::make_transform_iterator(&y[0], f);
-    //auto end = hpx::util::make_transform_iterator(&y[0] + N, f);
-
-    std::copy(i, end, std::ostream_iterator<int>{std::cout, " "});
+    transform_iterator_function_object();
+    transform_iterator_lambda();
 
     return hpx::finalize();
 }
