@@ -16,6 +16,28 @@
 void hw(std::size_t a_rows, std::size_t a_cols,
     std::size_t b_rows, std::size_t b_cols);
 HPX_PLAIN_ACTION(hw, hw_action);
+
+blaze::DynamicMatrix<double> mul_kij(const blaze::DynamicMatrix<double>& a,
+    const blaze::DynamicMatrix<double>& b)
+{
+    blaze::DynamicMatrix<double> c(a.rows(), b.columns(), 0);
+
+    {
+        for (int k = 0; k < a.columns(); ++k)
+        {
+            for (int i = 0; i < a.rows(); ++i)
+            {
+                for (int j = 0; j < b.columns(); ++j)
+                {
+                    c(i, j) += a(i, k) * b(k, j);
+                }
+            }
+        }
+    }
+
+    return c;
+}
+
 void hw(std::size_t a_rows, std::size_t a_cols,
     std::size_t b_rows, std::size_t b_cols)
 {
@@ -30,20 +52,7 @@ void hw(std::size_t a_rows, std::size_t a_cols,
     std::cout << "Expected C =\n" << expected << "\n";
 
     {
-        blaze::DynamicMatrix<double> c(a.rows(), b.columns(), 0);
-
-        {
-            for (int k = 0; k < a.columns(); ++k)
-            {
-                for (int i = 0; i < a.rows(); ++i)
-                {
-                    for (int j = 0; j < b.columns(); ++j)
-                    {
-                        c(i, j) += a(i, k) * b(k, j);
-                    }
-                }
-            }
-        }
+        auto c = mul_kij(a, b);
 
         std::cout << "Actual C =\n" << c << "\n";
         std::cout << "Is expected == actual? " << std::boolalpha << (expected == c) << "\n";
