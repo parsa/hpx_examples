@@ -24,4 +24,5 @@ add_hpx_executable(
 # warning C4167: conversion from 'size_t' to 'int', possible loss of data
 # warning C4552: '*': operator has no effect; expected operator with side-effect
 # warning C4805: '==': unsafe mix of type 'const bool' and type 'const uint8_t' in operation
-target_compile_definitions(app1_exe PRIVATE NOMINMAX /wd4146 /wd4244 /wd4267 /wd4552 /wd4805)
+add_definitions(/DNOMINMAX /wd4146 /wd4244 /wd4267 /wd4552 /wd4805)
+#target_compile_definitions(app1_exe PRIVATE NOMINMAX /wd4146 /wd4244 /wd4267 /wd4552 /wd4805)
