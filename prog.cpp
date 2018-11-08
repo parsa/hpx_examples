@@ -127,7 +127,7 @@ blaze::DynamicMatrix<double> mul_summa_parallel(
 
     {
         //std::size_t const os_threads = hpx::get_os_thread_count();
-        std::size_t const block_size = 40;  //std::sqrt(os_threads);
+        std::size_t const block_size = 1;  //std::sqrt(os_threads);
 
         // for k := 0 to n - 1 by b
         for (int k = 0; k < a.columns(); k += block_size)

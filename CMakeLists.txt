@@ -16,13 +16,22 @@ add_hpx_executable(
     app1
     SOURCES prog.cpp
     COMPONENT_DEPENDENCIES iostreams
-	DEPENDENCIES blaze::blaze
+    DEPENDENCIES blaze::blaze
 )
 
-# warning C4146: unary minus operator applied to unsigned type, result still unsigned
-# warning C4244: conversion from 'uint64_t' to 'int', possible loss of data
-# warning C4167: conversion from 'size_t' to 'int', possible loss of data
-# warning C4552: '*': operator has no effect; expected operator with side-effect
-# warning C4805: '==': unsafe mix of type 'const bool' and type 'const uint8_t' in operation
-add_definitions(/DNOMINMAX /wd4146 /wd4244 /wd4267 /wd4552 /wd4805)
-#target_compile_definitions(app1_exe PRIVATE NOMINMAX /wd4146 /wd4244 /wd4267 /wd4552 /wd4805)
+target_compile_definitions(app1_exe PRIVATE BLAZE_USE_HPX_THREADS)
+if (MSVC)
+    # windows.h conflicts with STL's min and max
+    target_compile_definitions(app1_exe PRIVATE NOMINMAX)
+
+    # warning C4146: unary minus operator applied to unsigned type, result still unsigned
+    target_compile_options(app1_exe PRIVATE /wd4146)
+    # warning C4244: conversion from 'uint64_t' to 'int', possible loss of data
+    target_compile_options(app1_exe PRIVATE /wd4244)
+    # warning C4267: conversion from 'size_t' to 'int', possible loss of data
+    target_compile_options(app1_exe PRIVATE /wd4267)
+    # warning C4552: '*': operator has no effect; expected operator with side-effect
+    target_compile_options(app1_exe PRIVATE /wd4552)
+    # warning C4805: '==': unsafe mix of type 'const bool' and type 'const uint8_t' in operation
+    target_compile_options(app1_exe PRIVATE /wd4805)
+endif()
